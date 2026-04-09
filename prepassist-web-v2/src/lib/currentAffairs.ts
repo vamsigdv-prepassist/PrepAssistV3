@@ -1,5 +1,4 @@
-import { db } from "./firebase";
-import { collection, addDoc, getDocs, query, orderBy, limit, serverTimestamp, where, writeBatch, doc, deleteDoc } from "firebase/firestore";
+import { supabase } from "./supabase";
 
 export interface CurrentAffair {
   id?: string;
@@ -14,13 +13,17 @@ export interface CurrentAffair {
 export const addCurrentAffair = async (affair: Omit<CurrentAffair, 'id' | 'createdAt'>) => {
   try {
     const formattedTags = (affair.tags || []).map(t => t.toLowerCase().trim());
-    const docRef = await addDoc(collection(db, "current_affairs"), {
-      ...affair,
+    
+    const { data, error } = await supabase.from('current_affairs').insert([{
+      title: affair.title,
+      source: affair.source,
+      content: affair.content,
       tags: formattedTags,
-      publishDate: affair.publishDate, // Enforce Calendar Date linking
-      createdAt: serverTimestamp()
-    });
-    return docRef.id;
+      publish_date: affair.publishDate
+    }]).select();
+    
+    if (error) throw error;
+    return data[0].id;
   } catch (error) {
     console.error("Error pushing Current Affair to DB:", error);
     throw error;
@@ -29,28 +32,17 @@ export const addCurrentAffair = async (affair: Omit<CurrentAffair, 'id' | 'creat
 
 export const bulkAddCurrentAffairs = async (affairs: Omit<CurrentAffair, 'id' | 'createdAt'>[]) => {
   try {
-    const batch = writeBatch(db);
-    const colRef = collection(db, "current_affairs");
-    
-    affairs.forEach(affair => {
-      const formattedTags = (affair.tags || []).map(t => t.toLowerCase().trim());
-      batch.set(doc(colRef), {
+    const formattedPayload = affairs.map(affair => ({
         title: affair.title || "Untitled UPSC Extraction",
         content: affair.content || "",
         source: affair.source || "Unknown Publication",
-        tags: formattedTags,
-        publishDate: affair.publishDate,
-        createdAt: serverTimestamp()
-      });
-    });
-    
-    // Forcefully timeout Firebase if Websockets are blocked
-    const commitPromise = batch.commit();
-    const timeoutPromise = new Promise((_, reject) => {
-       setTimeout(() => reject(new Error("FIREBASE TIMEOUT: The connection to Google Firestore was forcefully dropped. Ensure you are connected to the network and your AdBlockers/Firewalls are not blocking Firebase WebSockets.")), 8000);
-    });
-    
-    await Promise.race([commitPromise, timeoutPromise]);
+        tags: (affair.tags || []).map(t => t.toLowerCase().trim()),
+        publish_date: affair.publishDate
+    }));
+
+    const { error } = await supabase.from('current_affairs').insert(formattedPayload);
+
+    if (error) throw error;
   } catch (error) {
     console.error("Error pushing batch Current Affairs to DB:", error);
     throw error;
@@ -59,9 +51,22 @@ export const bulkAddCurrentAffairs = async (affairs: Omit<CurrentAffair, 'id' | 
 
 export const fetchRecentCurrentAffairs = async (maxResults: number = 10) => {
   try {
-    const q = query(collection(db, "current_affairs"), orderBy("createdAt", "desc"), limit(maxResults));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as CurrentAffair));
+    const { data, error } = await supabase.from('current_affairs')
+       .select('*')
+       .order('created_at', { ascending: false })
+       .limit(maxResults);
+       
+    if (error) throw error;
+    
+    return (data || []).map(d => ({
+       id: d.id,
+       title: d.title,
+       source: d.source,
+       content: d.content,
+       tags: d.tags || [],
+       publishDate: d.publish_date,
+       createdAt: d.created_at
+    })) as CurrentAffair[];
   } catch (error) {
     console.error("Error fetching Current Affairs:", error);
     return [];
@@ -70,18 +75,22 @@ export const fetchRecentCurrentAffairs = async (maxResults: number = 10) => {
 
 export const fetchAffairsByDate = async (dateStr: string): Promise<CurrentAffair[]> => {
   try {
-    const q = query(
-      collection(db, "current_affairs"),
-      where("publishDate", "==", dateStr)
-    );
-    const querySnapshot = await getDocs(q);
-    const affairs: CurrentAffair[] = [];
-    querySnapshot.forEach((doc) => {
-      affairs.push({ id: doc.id, ...doc.data() } as CurrentAffair);
-    });
-    
-    // In-memory sort bypasses complex Firebase indexing constraints
-    return affairs.sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds);
+    const { data, error } = await supabase.from('current_affairs')
+       .select('*')
+       .eq('publish_date', dateStr)
+       .order('created_at', { ascending: false });
+       
+    if (error) throw error;
+
+    return (data || []).map(d => ({
+       id: d.id,
+       title: d.title,
+       source: d.source,
+       content: d.content,
+       tags: d.tags || [],
+       publishDate: d.publish_date,
+       createdAt: d.created_at
+    })) as CurrentAffair[];
   } catch (error) {
     console.error("Error fetching affairs by date: ", error);
     return [];
@@ -91,8 +100,8 @@ export const fetchAffairsByDate = async (dateStr: string): Promise<CurrentAffair
 export const deleteCurrentAffair = async (id: string) => {
   if (!id) throw new Error("Missing ID for deletion directive.");
   try {
-    const docRef = doc(db, "current_affairs", id);
-    await deleteDoc(docRef);
+    const { error } = await supabase.from('current_affairs').delete().eq('id', id);
+    if (error) throw error;
   } catch (error) {
     console.error("Error destroying Current Affair Payload:", error);
     throw error;
