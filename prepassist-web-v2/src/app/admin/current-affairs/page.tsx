@@ -57,7 +57,7 @@ export default function CurrentAffairsAdmin() {
       loadAffairs();
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      alert("Failed to inject into Firebase Firestore.");
+      alert("Failed to inject into Supabase Database.");
     } finally {
       setIsSaving(false);
     }
@@ -140,7 +140,7 @@ export default function CurrentAffairsAdmin() {
         setSuccess(true);
         loadAffairs();
         // Give native browser validation feedback so user isn't guessing if it worked
-        alert("SUCCESS: Pushed exactly " + enrichedAffairs.length + " Newspaper Extractions perfectly to Firestore Cloud Database!");
+        alert("SUCCESS: Pushed exactly " + enrichedAffairs.length + " Newspaper Extractions perfectly to Supabase Database!");
         setTimeout(() => setSuccess(false), 3000);
      } catch (error: any) {
         alert("CRASH LOG: " + error.message);
@@ -154,7 +154,7 @@ export default function CurrentAffairsAdmin() {
        <header className="mb-12 max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
          <motion.div initial={{opacity:0, x:-20}} animate={{opacity:1, x:0}}>
            <p className="text-sky-400 text-xs font-black uppercase tracking-widest mb-2 flex items-center gap-2">
-              <Database className="w-4 h-4"/> Firebase Database Admin
+              <Database className="w-4 h-4"/> Supabase Database Admin
            </p>
            <h1 className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-sky-400">
              Current Affairs Registry
@@ -194,7 +194,7 @@ export default function CurrentAffairsAdmin() {
              {success && (
                 <div className="glass p-4 bg-green-500/10 border border-green-500/30 rounded-2xl flex items-center gap-3 text-green-400 shadow-[0_0_20px_rgba(34,197,94,0.1)]">
                    <CheckCircle2 className="w-5 h-5"/>
-                   <span className="font-bold">Successfully injected directly into Firestore!</span>
+                   <span className="font-bold">Successfully injected directly into Supabase!</span>
                 </div>
              )}
 
@@ -360,7 +360,7 @@ export default function CurrentAffairsAdmin() {
              <div className="glass rounded-3xl border border-white/5 bg-[#020617]/50 shadow-2xl flex flex-col flex-1 overflow-hidden">
                 <div className="p-8 border-b border-white/10 flex items-center justify-between bg-white/[0.01]">
                    <h3 className="text-xl font-bold text-white flex items-center gap-3">
-                      <Database className="w-5 h-5 text-sky-400" /> Firebase Remote Data
+                      <Database className="w-5 h-5 text-sky-400" /> Supabase Remote Data
                    </h3>
                 </div>
                 
@@ -368,7 +368,7 @@ export default function CurrentAffairsAdmin() {
                    {isLoading ? (
                      <div className="flex flex-col items-center justify-center h-full opacity-50">
                         <Loader2 className="w-8 h-8 animate-spin mb-4" />
-                        <p>Querying Firestore Entities...</p>
+                        <p>Querying Supabase Entities...</p>
                      </div>
                    ) : affairsList.length === 0 ? (
                      <div className="text-center p-10 opacity-50 border border-dashed border-white/20 rounded-3xl">
