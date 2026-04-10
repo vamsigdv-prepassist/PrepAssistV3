@@ -18,12 +18,20 @@ async function executeWithResilience<T>(fn: () => Promise<T>, label: string, ret
          return await fn();
       } catch (error: any) {
          lastError = error;
-         const isRateLimit = error?.message?.includes("429") || error?.status === 429;
-         const isPotentialTransient = error?.status >= 500 || error?.message?.includes("fetch");
+         const errorMsg = error?.message || "";
+         const isRateLimit = errorMsg.includes("429") || error?.status === 429;
+         const isQuotaExceeded = errorMsg.toLowerCase().includes("quota exceeded") || errorMsg.includes("limit: 0");
+         const isPotentialTransient = error?.status >= 500 || errorMsg.includes("fetch");
          
+         // If quota is hard-capped (limit: 0), retrying the same model is useless. Fall back immediately.
+         if (isQuotaExceeded) {
+            console.warn(`[${label}] Hard Quota Limit Reached (Limit: 0). Skipping retries and triggering tier fallback...`);
+            throw error; 
+         }
+
          if ((isRateLimit || isPotentialTransient) && i < retries - 1) {
             const waitTime = (i + 1) * 4000; // 4s, 8s, 12s backoff
-            console.warn(`[${label}] Resilience Triggered (Attempt ${i+1}/${retries}). Error: ${error.message}. Waiting ${waitTime}ms...`);
+            console.warn(`[${label}] Resilience Triggered (Attempt ${i+1}/${retries}). Error: ${errorMsg}. Waiting ${waitTime}ms...`);
             await new Promise(r => setTimeout(r, waitTime));
             continue;
          }
@@ -99,16 +107,16 @@ export async function POST(req: Request) {
          const result = await executeWithResilience(() => model.generateContent([{ text: prompt }, config]), "Tier 1: 2.5 Flash");
          extractedText = result.response.text();
       } catch (e: any) {
-         console.warn("Tier 1 Failed, trying Tier 2 (2.0 Flash):", e.message);
+         console.warn("Tier 1 Failed, trying Tier 2 (1.5 Pro):", e.message);
          try {
-            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-            const result = await executeWithResilience(() => model.generateContent([{ text: prompt }, config]), "Tier 2: 2.0 Flash");
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+            const result = await executeWithResilience(() => model.generateContent([{ text: prompt }, config]), "Tier 2: 1.5 Pro");
             extractedText = result.response.text();
          } catch (e2: any) {
-            console.warn("Tier 2 Failed, trying Tier 3 (1.5 Pro):", e2.message);
+            console.warn("Tier 2 Failed, trying Legacy Tier 3 (2.0 Flash):", e2.message);
             try {
-               const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-               const result = await executeWithResilience(() => model.generateContent([{ text: prompt }, config]), "Tier 3: 1.5 Pro");
+               const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+               const result = await executeWithResilience(() => model.generateContent([{ text: prompt }, config]), "Tier 3: 2.0 Flash");
                extractedText = result.response.text();
             } catch (ultimateError: any) {
                console.error("CRITICAL: All Generative Extraction Tiers Exhausted.", ultimateError);
@@ -192,12 +200,12 @@ export async function POST(req: Request) {
        });
        result = await executeWithResilience(() => model.generateContent(agentPrompt), "Synthesis Prime (G2.5)");
     } catch (flashError) {
-       console.warn("Gemini 2.5 Synthesis fail, trying Stable 2.0 fallback:", flashError);
+       console.warn("Gemini 2.5 Synthesis fail, trying Stable 1.5 Pro fallback:", flashError);
        const fallbackModel = genAI.getGenerativeModel({ 
-          model: "gemini-2.0-flash",
+          model: "gemini-1.5-pro",
           systemInstruction: `You are the absolute UPSC Master Mentor for ${subject}.`
        });
-       result = await executeWithResilience(() => fallbackModel.generateContent(agentPrompt), "Synthesis Stable (G2.0)");
+       result = await executeWithResilience(() => fallbackModel.generateContent(agentPrompt), "Synthesis Stable (G1.5 Pro)");
     }
     const responseText = result.response.text().trim();
     
