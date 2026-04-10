@@ -14,8 +14,8 @@ export async function generateUPSCIdentity(text: string): Promise<number[]> {
     if (!apiKey) {
       throw new Error("Missing Native Google API Credentials.");
     }
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
+    const genAI = new GoogleGenerativeAI(apiKey, { apiVersion: 'v1' });
+    const model = genAI.getGenerativeModel({ model: "text-embedding-004" }, { apiVersion: "v1" });
     
     // Adding instruction helps the model focus on academic/educational retrieval
     const taskText = `Represent this UPSC academic sentence for retrieval: ${text}`;

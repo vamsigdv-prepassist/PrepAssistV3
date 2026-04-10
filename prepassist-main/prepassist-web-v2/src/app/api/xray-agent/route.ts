@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     if (!apiKey) {
       return NextResponse.json({ error: "Native Google API Credentials missing for Agent Synthesis." }, { status: 500 });
     }
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = new GoogleGenerativeAI(apiKey, { apiVersion: 'v1' });
 
     // PHASE 1: Parse the file natively
     let extractedText = "";
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
 
     if (isPdf || isImage) {
       try {
-         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: "v1" });
          const prompt = "Extract literally all textual data, words, numbers, and references exactly as written from this document or image. Provide only the raw transcription.";
          
          const mimeType = isPdf ? "application/pdf" : file.type;

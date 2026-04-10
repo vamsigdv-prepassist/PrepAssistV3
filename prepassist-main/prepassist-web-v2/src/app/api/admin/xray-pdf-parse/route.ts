@@ -45,8 +45,8 @@ export async function POST(req: Request) {
         const buffer = Buffer.from(arrayBuffer);
         const pdfPart = bufferToGenerativePart(buffer, "application/pdf");
 
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const genAI = new GoogleGenerativeAI(apiKey, { apiVersion: 'v1' });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: "v1" });
 
         const prompt = "Extract absolutely all text mechanically from this academic PDF document exactly matching its linear layout natively. Do not summarize, skip, or format using markdown. Process and extract raw content seamlessly across every page.";
 

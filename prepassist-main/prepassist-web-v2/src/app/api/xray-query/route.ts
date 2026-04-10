@@ -5,7 +5,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Native Fallback Engine Initialization
 const apiKey = process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY || "";
-const genAI = new GoogleGenerativeAI(apiKey);
+const genAI = new GoogleGenerativeAI(apiKey, { apiVersion: 'v1' });
 
 export async function POST(req: Request) {
   try {
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Native Google API Credentials missing for fallback generator.' }, { status: 500 });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: "v1" });
     const extractionPrompt = `
       You are a strict UPSC Professor. I have a sentence extracted from a document. 
       Analyze this sentence strictly from the UPSC Civil Services perspective: "${sentence}"
