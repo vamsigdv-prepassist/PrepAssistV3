@@ -155,10 +155,14 @@ export async function POST(req: Request) {
     
     Use explicit \n\n for paragraph spacing between sections.`;
 
+    const cleanKey = openRouterKey.replace(/["']/g, "").trim();
+
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${openRouterKey}`,
+        "Authorization": `Bearer ${cleanKey}`,
+        "HTTP-Referer": "http://localhost:3000",
+        "X-Title": "PrepAssist Admin",
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -172,7 +176,10 @@ export async function POST(req: Request) {
       })
     });
 
-    if (!response.ok) throw new Error("AI Processing failed: " + response.statusText);
+    if (!response.ok) {
+       const errBody = await response.text();
+       throw new Error(`AI Processing failed: ${response.statusText}. OpenRouter Details: ${errBody}. (Key format start: ${cleanKey.substring(0, 5)}...)`);
+    }
     const data = await response.json();
     
     if (!data.choices || data.choices.length === 0) {
