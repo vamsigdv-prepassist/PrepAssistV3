@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { LayoutDashboard, FileText, Target, Activity, Settings, User, LogOut, ChevronDown, PenTool, Globe, Cloud, ListChecks, BookOpen, CreditCard, Zap, Network, Bell, FolderUp, Database, HardDrive, Bot, BrainCircuit, ScanText } from "lucide-react";
+import { LayoutDashboard, FileText, Target, Activity, Settings, User, LogOut, ChevronDown, PenTool, Globe, Cloud, ListChecks, BookOpen, CreditCard, Zap, Network, Bell, FolderUp, Database, HardDrive, Bot, BrainCircuit, ScanText, CalendarDays } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { db } from "@/lib/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
@@ -146,6 +146,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="flex-1 overflow-y-auto py-8 px-4 space-y-2">
            <div className="text-xs font-black uppercase tracking-widest text-white/30 px-4 mb-4 mt-2">Core Ecosystem</div>
            <NavLink href="/dashboard" icon={LayoutDashboard} label="Dashboard Hub" />
+           <NavLink href="/calendar" icon={CalendarDays} label="Study Calendar" />
            <NavLink href="/ai-mentor" icon={Bot} label="AI Mentor" />
            <NavLink href="/account/billing" icon={CreditCard} label="Billing & Plans" />
            <NavLink href="/quiz" icon={FileText} label="PDF Extraction" />
