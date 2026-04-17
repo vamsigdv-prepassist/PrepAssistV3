@@ -112,6 +112,11 @@ function MainsEvaluationContent() {
       });
       
       const data = await response.json();
+
+      if (!response.ok || data.error) {
+         throw new Error(data.error || "Failed to process evaluation. Please try again.");
+      }
+
       setResult(data);
       
       setHistory(prev => [{
