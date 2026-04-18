@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Database, Plus, Save, Loader2, Search, CheckCircle2, FileText, UploadCloud, BrainCircuit, X, CalendarDays, Layers, Trash2 } from "lucide-react";
 import { addCurrentAffair, bulkAddCurrentAffairs, fetchRecentCurrentAffairs, deleteCurrentAffair, CurrentAffair } from "@/lib/currentAffairs";
-import { supabase } from "@/lib/supabase";
+import { adminSupabase as supabase } from "@/lib/supabase";
 export default function CurrentAffairsAdmin() {
   const [tab, setTab] = useState<"manual" | "bulk">("bulk");
 
@@ -34,7 +34,7 @@ export default function CurrentAffairsAdmin() {
 
   const loadAffairs = async () => {
     setIsLoading(true);
-    const data = await fetchRecentCurrentAffairs(20);
+    const data = await fetchRecentCurrentAffairs(20, supabase);
     setAffairsList(data);
     setIsLoading(false);
   };
@@ -51,7 +51,7 @@ export default function CurrentAffairsAdmin() {
          source: source || "Internal Editor",
          tags: tags.split(",").map(t => t.trim()).filter(Boolean),
          publishDate
-      });
+       }, supabase);
       setSuccess(true);
       setTitle(""); setContent(""); setSource(""); setTags("");
       loadAffairs();
@@ -66,7 +66,7 @@ export default function CurrentAffairsAdmin() {
   const handleDeleteArticle = async (id: string, title: string) => {
      if (!window.confirm(`Destructive Action! Are you absolutely sure you want to permanently delete "${title}"?`)) return;
      try {
-        await deleteCurrentAffair(id);
+        await deleteCurrentAffair(id, supabase);
         alert(`Successfully deleted "${title}" from the registry.`);
         loadAffairs();
      } catch (err: any) {
@@ -112,10 +112,7 @@ export default function CurrentAffairsAdmin() {
            throw new Error(errData?.error || `HTTP ${res.status}: API Gateway Crash`);
        }
        
-       const { results, isMock } = await res.json();
-       if (isMock) {
-          alert("DEV NOTE: You did not link your OpenRouter API Key in .env.local! The AI processed the PDF but gracefully fell back to the 2-article mock payload to prevent a crash.");
-       }
+       const { results } = await res.json();
        setExtractedAffairs(results);
      } catch (e: any) {
        console.error(e);
@@ -134,7 +131,7 @@ export default function CurrentAffairsAdmin() {
            publishDate: bulkPublishDate,
            source: bulkProvider // Enforce strict source consistency over AI hallucinations
         }));
-        await bulkAddCurrentAffairs(enrichedAffairs);
+        await bulkAddCurrentAffairs(enrichedAffairs, supabase);
         setExtractedAffairs([]);
         setBulkFile(null);
         setSuccess(true);
