@@ -8,10 +8,14 @@ const config: CapacitorConfig = {
   // Points the native shell to Next.js node instances directly. 
   server: {
     // Android emulator alias for localhost.
-    url: 'http://10.0.2.2:3000', 
-    // Uncomment the URL below for absolute Production Deployments!
-    // url: 'https://prepassist.in',
-    cleartext: true
+    // url: 'http://10.0.2.2:3000', 
+    // Absolute Production Deployments!
+    url: 'https://prepassist.in',
+    cleartext: true,
+    allowNavigation: [
+      "*.prepassist.in",
+      "prepassist.in"
+    ]
   }
 };
 
