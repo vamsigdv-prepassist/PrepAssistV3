@@ -222,12 +222,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
          {/* Top Glass Header */}
          <header className="sticky top-0 h-20 bg-[#020617]/60 backdrop-blur-xl border-b border-white/5 z-30 px-4 md:px-8 flex items-center justify-between shadow-2xl">
             <div className="flex items-center gap-2 md:gap-3">
-               <button 
-                onClick={() => setIsSidebarOpen(true)} 
-                className="md:hidden p-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white transition-colors mr-2"
-               >
-                 <Menu className="w-5 h-5" />
-               </button>
                <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-white/30 truncate max-w-[120px] md:max-w-none hidden sm:inline-block">
                   Auth Nav <span className="mx-2 text-indigo-500">/</span> {pathname.replace('/', '').toUpperCase() || 'DASHBOARD'}
                </span>
@@ -319,9 +313,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
          </header>
 
          {/* Internal Payload Engine */}
-         <div className="flex-1 relative pb-20 mt-6">
+         <div className="flex-1 relative pb-32 md:pb-20 mt-6 overflow-y-auto">
             {children}
          </div>
+
+         {/* Mobile Bottom Navigation Architecture */}
+         <nav className="fixed bottom-0 left-0 w-full h-16 bg-[#020617]/90 backdrop-blur-xl border-t border-white/10 z-40 md:hidden flex items-center justify-around px-2 shadow-[0_-10px_40px_rgba(0,0,0,0.8)] pb-safe-bottom">
+            <Link href="/dashboard" className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${pathname === '/dashboard' ? 'text-indigo-400 scale-110' : 'text-white/40 hover:text-white/80'}`}>
+               <LayoutDashboard className="w-5 h-5" />
+               <span className="text-[9px] font-bold">Home</span>
+            </Link>
+            <Link href="/daily-news" className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${pathname === '/daily-news' ? 'text-indigo-400 scale-110' : 'text-white/40 hover:text-white/80'}`}>
+               <Globe className="w-5 h-5" />
+               <span className="text-[9px] font-bold">News</span>
+            </Link>
+            <Link href="/question-bank" className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${pathname === '/question-bank' ? 'text-indigo-400 scale-110' : 'text-white/40 hover:text-white/80'}`}>
+               <ListChecks className="w-5 h-5" />
+               <span className="text-[9px] font-bold">Q-Bank</span>
+            </Link>
+            <Link href="/quiz" className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${pathname === '/quiz' ? 'text-indigo-400 scale-110' : 'text-white/40 hover:text-white/80'}`}>
+               <FileText className="w-5 h-5" />
+               <span className="text-[9px] font-bold">Extract</span>
+            </Link>
+            <button onClick={() => setIsSidebarOpen(true)} className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${isSidebarOpen ? 'text-indigo-400 scale-110' : 'text-white/40 hover:text-white/80'}`}>
+               <Menu className="w-5 h-5" />
+               <span className="text-[9px] font-bold">Menu</span>
+            </button>
+         </nav>
 
          <SupportWidget />
       </main>
