@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Database, Plus, Save, Loader2, Search, CheckCircle2, FileText, UploadCloud, BrainCircuit, X, CalendarDays, Layers, Trash2 } from "lucide-react";
 import { addCurrentAffair, bulkAddCurrentAffairs, fetchRecentCurrentAffairs, deleteCurrentAffair, CurrentAffair } from "@/lib/currentAffairs";
-import { adminSupabase as supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
 export default function CurrentAffairsAdmin() {
   const [tab, setTab] = useState<"manual" | "bulk">("bulk");
 

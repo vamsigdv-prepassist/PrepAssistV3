@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     
     let credentialsP = process.env.GOOGLE_APPLICATION_CREDENTIALS;
     if (credentialsP && !path.isAbsolute(credentialsP)) {
-       credentialsP = path.resolve(process.cwd(), credentialsP);
+       credentialsP = path.resolve(/*turbopackIgnore: true*/ process.cwd(), credentialsP);
     }
     const client = new vision.ImageAnnotatorClient(
       credentialsP ? { keyFilename: credentialsP } : {
