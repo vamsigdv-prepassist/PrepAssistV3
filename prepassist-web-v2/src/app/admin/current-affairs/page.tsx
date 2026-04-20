@@ -34,7 +34,7 @@ export default function CurrentAffairsAdmin() {
 
   const loadAffairs = async () => {
     setIsLoading(true);
-    const data = await fetchRecentCurrentAffairs(20, supabase);
+    const data = await fetchRecentCurrentAffairs(20);
     setAffairsList(data);
     setIsLoading(false);
   };
@@ -51,7 +51,7 @@ export default function CurrentAffairsAdmin() {
          source: source || "Internal Editor",
          tags: tags.split(",").map(t => t.trim()).filter(Boolean),
          publishDate
-       }, supabase);
+       });
       setSuccess(true);
       setTitle(""); setContent(""); setSource(""); setTags("");
       loadAffairs();
@@ -66,7 +66,7 @@ export default function CurrentAffairsAdmin() {
   const handleDeleteArticle = async (id: string, title: string) => {
      if (!window.confirm(`Destructive Action! Are you absolutely sure you want to permanently delete "${title}"?`)) return;
      try {
-        await deleteCurrentAffair(id, supabase);
+        await deleteCurrentAffair(id);
         alert(`Successfully deleted "${title}" from the registry.`);
         loadAffairs();
      } catch (err: any) {
@@ -131,7 +131,7 @@ export default function CurrentAffairsAdmin() {
            publishDate: bulkPublishDate,
            source: bulkProvider // Enforce strict source consistency over AI hallucinations
         }));
-        await bulkAddCurrentAffairs(enrichedAffairs, supabase);
+        await bulkAddCurrentAffairs(enrichedAffairs);
         setExtractedAffairs([]);
         setBulkFile(null);
         setSuccess(true);
