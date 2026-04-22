@@ -117,15 +117,15 @@ export default function Home() {
         {/* Live Metrics Grid */}
         <section className="w-full flex flex-wrap justify-center gap-6 md:gap-12 pt-8 pb-16 relative z-10 max-w-5xl mx-auto">
           <div className="flex flex-col items-center p-8 bg-white border border-slate-200 rounded-[32px] shadow-sm min-w-[240px] hover:shadow-md transition-shadow">
-            <span className="text-4xl md:text-5xl font-black text-indigo-600 mb-2">24,500+</span>
+            <span className="text-4xl md:text-5xl font-black text-indigo-600 mb-2">25,000+</span>
             <span className="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">App Downloads</span>
           </div>
           <div className="flex flex-col items-center p-8 bg-white border border-slate-200 rounded-[32px] shadow-sm min-w-[240px] hover:shadow-md transition-shadow">
-            <span className="text-4xl md:text-5xl font-black text-emerald-600 mb-2">12,200+</span>
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Active Aspirants</span>
+            <span className="text-4xl md:text-5xl font-black text-emerald-600 mb-2">15,000+</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Happy Aspirants</span>
           </div>
           <div className="flex flex-col items-center p-8 bg-white border border-slate-200 rounded-[32px] shadow-sm min-w-[240px] hover:shadow-md transition-shadow">
-            <span className="text-4xl md:text-5xl font-black text-sky-600 mb-2">1.8M+</span>
+            <span className="text-4xl md:text-5xl font-black text-sky-600 mb-2">2M+</span>
             <span className="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Notes Synthesized</span>
           </div>
         </section>
