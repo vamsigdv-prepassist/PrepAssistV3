@@ -1,4 +1,9 @@
 import { NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+// Native Fallback Engine Initialization or Main Engine
+const apiKey = process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY || "";
+const genAI = new GoogleGenerativeAI(apiKey);
 
 export async function POST(req: Request) {
   try {
@@ -8,9 +13,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No answer provided" }, { status: 400 });
     }
 
-    const openRouterKey = process.env.OPENROUTER_API_KEY;
-    if (!openRouterKey) {
-      console.warn("No OpenRouter API key found. Returning mock evaluation.");
+    if (!apiKey) {
+      console.warn("No Google API key found. Returning mock evaluation.");
       return NextResponse.json({
         score: 72,
         examinerRemark: "Good structural flow, but the content needs tighter alignment with the specific word limit constraint.",
@@ -30,7 +34,6 @@ export async function POST(req: Request) {
       });
     }
 
-    let messages: any[] = [];
     let ragConfiguration = "";
 
     if (includeNotes) {
@@ -73,43 +76,37 @@ Please provide a comprehensive evaluation in the following JSON format (respond 
 
 Be honest, constructive, and specific in your feedback. The score should reflect stringent UPSC Mains standards.`;
 
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const parts: any[] = [];
+    
+    parts.push({ text: basePrompt });
+
     if (imageBase64) {
-        messages = [
-          {
-            role: "user",
-            content: [
-              { type: "text", text: basePrompt },
-              { type: "image_url", image_url: { url: imageBase64 } }
-            ]
-          }
-        ];
-    } else {
-        messages = [
-          {
-            role: "user",
-            content: basePrompt
-          }
-        ];
+        // Strip data:image/jpeg;base64, prefix properly
+        const match = imageBase64.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
+        let mimeType = "image/jpeg";
+        let base64Data = imageBase64;
+        
+        if (match) {
+            mimeType = match[1];
+            base64Data = match[2];
+        } else if (imageBase64.includes(";base64,")) {
+            mimeType = imageBase64.split(";")[0].split(":")[1];
+            base64Data = imageBase64.split(";base64,")[1];
+        }
+        
+        parts.push({
+            inlineData: {
+                data: base64Data,
+                mimeType: mimeType
+            }
+        });
     }
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${openRouterKey}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-4o", // Changed to robust vision/text multimodel for max generation depth
-        messages: messages,
-        temperature: 0.7
-      })
-    });
-
-    if (!response.ok) throw new Error(`API responded with ${response.status}`);
-
-    const data = await response.json();
-    const resultText = data.choices[0]?.message?.content;
-    const cleanJson = resultText.replace(/```json/g, '').replace(/```/g, '').trim();
+    const result = await model.generateContent(parts);
+    const resultText = result.response.text();
+    
+    const cleanJson = resultText.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
     const evaluation = JSON.parse(cleanJson);
 
     if (typeof evaluation.score !== 'number' || evaluation.score < 0 || evaluation.score > 100) {

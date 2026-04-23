@@ -114,6 +114,21 @@ export default function Home() {
         </section>
 
 
+        {/* Live Metrics Grid */}
+        <section className="w-full flex flex-wrap justify-center gap-6 md:gap-12 pt-8 pb-16 relative z-10 max-w-5xl mx-auto">
+          <div className="flex flex-col items-center p-8 bg-white border border-slate-200 rounded-[32px] shadow-sm min-w-[240px] hover:shadow-md transition-shadow">
+            <span className="text-4xl md:text-5xl font-black text-indigo-600 mb-2">25,000+</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">App Downloads</span>
+          </div>
+          <div className="flex flex-col items-center p-8 bg-white border border-slate-200 rounded-[32px] shadow-sm min-w-[240px] hover:shadow-md transition-shadow">
+            <span className="text-4xl md:text-5xl font-black text-emerald-600 mb-2">15,000+</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Happy Aspirants</span>
+          </div>
+          <div className="flex flex-col items-center p-8 bg-white border border-slate-200 rounded-[32px] shadow-sm min-w-[240px] hover:shadow-md transition-shadow">
+            <span className="text-4xl md:text-5xl font-black text-sky-600 mb-2">2M+</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Notes Synthesized</span>
+          </div>
+        </section>
 
         {/* Brand Banner */}
         <section className="w-full py-16 border-y border-slate-200 flex flex-col items-center justify-center text-center -mt-10 mb-32 bg-white">
@@ -202,6 +217,76 @@ export default function Home() {
                  </Link>
               </div>
 
+           </div>
+        </section>
+
+        {/* Testimonials Block */}
+        <section className="w-full flex flex-col items-center mt-32">
+           <div className="text-center mb-16 max-w-3xl">
+             <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 mb-6">Proven by Top Rankers.</h2>
+             <p className="text-slate-600 text-lg font-medium leading-relaxed">See how the PrepAssist ecosystem is accelerating the daily study output of actual UPSC candidates.</p>
+           </div>
+
+           <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Testimonial 1 */}
+              <div className="bg-white p-10 rounded-[32px] border border-slate-200 shadow-sm relative overflow-hidden group hover:border-indigo-300 hover:shadow-md transition-all">
+                 <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 blur-3xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                 <div className="flex items-center gap-4 mb-6 relative z-10">
+                    <div className="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center font-black text-xl text-indigo-700">AK</div>
+                    <div>
+                      <h4 className="font-bold text-slate-900 text-lg">Ananya K.</h4>
+                      <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mt-1">Focus: PDF to Quiz Engine</p>
+                    </div>
+                 </div>
+                 <p className="text-slate-600/90 leading-relaxed font-semibold italic relative z-10 text-[15px]">
+                    "I used to spend hours manually creating MCQ tests from my huge compiler PDFs. With PrepAssist, I just upload the PDF chunk, and within seconds, it generates an impossibly accurate 50-question Prelims test natively. It's literal magic."
+                 </p>
+              </div>
+
+              {/* Testimonial 2 */}
+              <div className="bg-white p-10 rounded-[32px] border border-slate-200 shadow-sm relative overflow-hidden group hover:border-sky-300 hover:shadow-md transition-all">
+                 <div className="absolute top-0 right-0 w-32 h-32 bg-sky-50 blur-3xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                 <div className="flex items-center gap-4 mb-6 relative z-10">
+                    <div className="w-14 h-14 bg-sky-100 rounded-2xl flex items-center justify-center font-black text-xl text-sky-700">RM</div>
+                    <div>
+                      <h4 className="font-bold text-slate-900 text-lg">Rahul M.</h4>
+                      <p className="text-[10px] font-bold text-sky-500 uppercase tracking-widest mt-1">Focus: Vector Database Storage</p>
+                    </div>
+                 </div>
+                 <p className="text-slate-600/90 leading-relaxed font-semibold italic relative z-10 text-[15px]">
+                    "The Dedicated Vector Database completely changed my revision strategy. Instead of hunting through 10 GB of unorganized files, I literally just ask the AI a syllabus query and it instantly pulls answers mapped securely to my own material!"
+                 </p>
+              </div>
+
+              {/* Testimonial 3 */}
+              <div className="bg-white p-10 rounded-[32px] border border-slate-200 shadow-sm relative overflow-hidden group hover:border-emerald-300 hover:shadow-md transition-all">
+                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 blur-3xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                 <div className="flex items-center gap-4 mb-6 relative z-10">
+                    <div className="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center font-black text-xl text-emerald-700">SV</div>
+                    <div>
+                      <h4 className="font-bold text-slate-900 text-lg">Sneha V.</h4>
+                      <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mt-1">Focus: Mains Answer Evaluations</p>
+                    </div>
+                 </div>
+                 <p className="text-slate-600/90 leading-relaxed font-semibold italic relative z-10 text-[15px]">
+                    "Getting my Mains answers checked used to delay me by days while waiting on mentors. The PrepAssist Computer Vision AI grades my handwriting instantly, giving me structural IBC feedback literally identical to an actual UPSC examiner."
+                 </p>
+              </div>
+
+              {/* Testimonial 4 */}
+              <div className="bg-white p-10 rounded-[32px] border border-slate-200 shadow-sm relative overflow-hidden group hover:border-rose-300 hover:shadow-md transition-all">
+                 <div className="absolute top-0 right-0 w-32 h-32 bg-rose-50 blur-3xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                 <div className="flex items-center gap-4 mb-6 relative z-10">
+                    <div className="w-14 h-14 bg-rose-100 rounded-2xl flex items-center justify-center font-black text-xl text-rose-700">JS</div>
+                    <div>
+                      <h4 className="font-bold text-slate-900 text-lg">Jay S.</h4>
+                      <p className="text-[10px] font-bold text-rose-500 uppercase tracking-widest mt-1">Focus: Alerts on Existing Notes</p>
+                    </div>
+                 </div>
+                 <p className="text-slate-600/90 leading-relaxed font-semibold italic relative z-10 text-[15px]">
+                    "The automated Alerts system pointing into my Existing Notes is an absolute lifesaver. Whenever current affairs break, the AI flags my exact folder and tells me which legacy notes I need to update dynamically. I never miss a syllabus linkage."
+                 </p>
+              </div>
            </div>
         </section>
 

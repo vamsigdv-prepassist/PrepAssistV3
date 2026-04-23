@@ -124,80 +124,45 @@ export async function POST(req: Request) {
 
     let resultText = "";
 
-    // TRY GEMINI 2.5 FLASH FIRST (Higher Context Window & Speed)
-    if (googleApiKey) {
-       console.log("Engaging Gemini 2.5 Flash for Newspaper Synthesis...");
-       try {
-           const genAI = new GoogleGenerativeAI(googleApiKey);
-           const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-           const genResult = await model.generateContent([prompt, extractedText]);
-           resultText = genResult.response.text().trim();
-       } catch (gError: any) {
-           console.warn("Gemini 2.5 News Sync failed, falling back:", gError.message);
-       }
+    // STRIP OPENROUTER COMPLETELY (Credits Exhausted)
+    // EXCLUSIVE GEMINI 2.5 FLASH INFERENCE
+    if (!googleApiKey) {
+       throw new Error("CRITICAL: Both GOOGLE_API_KEY and GOOGLE_GENERATIVE_AI_API_KEY are missing from environment keys.");
     }
 
-    // FALLBACK TO OPENROUTER IF GEMINI FAILED
-    if (!resultText && openRouterKey) {
-        console.log("Falling back to OpenRouter (GPT-4o) for Newspaper Synthesis...");
-        const cleanKey = openRouterKey.replace(/["']/g, "").trim();
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${cleanKey}`,
-            "HTTP-Referer": "http://localhost:3000",
-            "X-Title": "PrepAssist Admin",
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            model: "openai/gpt-4o",
-            messages: [
-               { role: "system", content: prompt },
-               { role: "user", content: extractedText }
-            ],
-            temperature: 0.1,
-            max_tokens: 12000
-          })
+    console.log("Engaging Gemini 2.5 Flash for Newspaper Synthesis...");
+    try {
+        const genAI = new GoogleGenerativeAI(googleApiKey);
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-1.5-flash", 
+            generationConfig: {
+                responseMimeType: "application/json",
+            }
         });
-
-        if (response.ok) {
-           const data = await response.json();
-           resultText = data.choices?.[0]?.message?.content?.trim() || "";
-        }
+        const genResult = await model.generateContent([prompt, extractedText]);
+        resultText = genResult.response.text().trim();
+    } catch (gError: any) {
+        throw new Error(`Gemini Validation Crash: ${gError.message}`);
     }
-
-    // FINAL MOCK FALLBACK (If both AI engines fail or keys missing)
+    
     if (!resultText) {
-       console.warn("All AI channels exhausted. Yielding mock dataset.");
-       return NextResponse.json({
-         results: [
-           { 
-             title: "Election Commission Reform Verdict", 
-             source: newspaperType, 
-             tags: ["GS2", "Polity", "Constitutional Bodies"], 
-             content: "The Supreme Court delivered a landmark ruling altering the appointment mechanism for the Chief Election Commissioner (CEC) and Election Commissioners (ECs)..." 
-           },
-           { 
-             title: "Green Hydrogen Mission Advancements", 
-             source: newspaperType, 
-             tags: ["GS3", "Environment", "Energy"], 
-             content: "The Ministry of New and Renewable Energy has unlocked the initial tranches of subsidies tailored for electrolyser manufacturing..." 
-           }
-         ],
-         isMock: true
-       });
-    }
-    if (!resultText || resultText === "[]") {
-       const preview = extractedText.substring(0, 300).replace(/\r?\n|\r/g, ' ');
-       throw new Error(`The AI successfully read the document but output 0 arrays! This usually means the PDF text is completely corrupted by custom fonts. \n\nRAW TEXT PREVIEW RECEIVED BY AI: "${preview}..."`);
+       throw new Error(`The AI successfully read the document but output 0 items! Ensure the document isn't purely custom fonts.`);
     }
     
-    if (resultText.startsWith("```json")) resultText = resultText.replace(/```json/g, "");
-    if (resultText.endsWith("```")) resultText = resultText.replace(/```$/g, "");
-    resultText = resultText.trim();
-    
-      const parsedResults = JSON.parse(resultText);
-      return NextResponse.json({ results: parsedResults });
+    // Attempt parsing directly (responseMimeType guarantees JSON array)
+    try {
+       const parsedResults = JSON.parse(resultText);
+       // Check if response is raw dict or array
+       if (Array.isArray(parsedResults)) {
+           return NextResponse.json({ results: parsedResults });
+       } else if (parsedResults && Array.isArray(parsedResults.results)) {
+           return NextResponse.json({ results: parsedResults.results });
+        } else {
+           throw new Error("Invalid output format schema natively.");
+       }
+    } catch (parseError: any) {
+        throw new Error(`Gemini generated structured JSON incorrectly. Error: ${parseError.message} || RAW TEXT: ${resultText}`);
+    }
       
   } catch (err: any) {
     console.error("Newspaper Extraction Error:", err);

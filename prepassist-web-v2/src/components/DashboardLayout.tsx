@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { LayoutDashboard, FileText, Target, Activity, Settings, User, LogOut, ChevronDown, PenTool, Globe, Cloud, ListChecks, BookOpen, CreditCard, Zap, Network, Bell, FolderUp, Database, HardDrive, Bot, BrainCircuit, ScanText, CalendarDays } from "lucide-react";
+import { Menu, X, LayoutDashboard, FileText, Target, Activity, Settings, User, LogOut, ChevronDown, PenTool, Globe, Cloud, ListChecks, BookOpen, CreditCard, Zap, Network, Bell, FolderUp, Database, HardDrive, Bot, BrainCircuit, ScanText, CalendarDays } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { db } from "@/lib/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
@@ -18,6 +18,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
    const pathname = usePathname() || "";
    const router = useRouter();
    const [isMenuOpen, setIsMenuOpen] = useState(false);
+   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
    const [userEmail, setUserEmail] = useState<string | null>(null);
    const [userName, setUserName] = useState<string | null>(null);
    const [creditBalance, setCreditBalance] = useState<number | null>(null);
@@ -122,7 +123,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                {subLinks.map((link: any, idx: number) => {
                   const isActive = pathname === link.href;
                   return (
-                    <Link key={idx} href={link.href} className={`block px-4 py-2 rounded-lg text-xs font-bold transition-all ${isActive ? 'bg-indigo-500/20 text-indigo-300' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
+                    <Link 
+                     key={idx} 
+                     href={link.href} 
+                     onClick={() => setIsSidebarOpen(false)}
+                     className={`block px-4 py-2 rounded-lg text-xs font-bold transition-all ${isActive ? 'bg-indigo-500/20 text-indigo-300' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
                       {link.label}
                     </Link>
                   )
@@ -135,12 +140,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen bg-[#020617] flex">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden" onClick={() => setIsSidebarOpen(false)} />
+      )}
+
       {/* Sidebar Navigation Matrix */}
-      <aside className="fixed left-0 top-0 h-screen w-72 bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 backdrop-blur-3xl border-r border-white/5 flex flex-col z-50 shadow-[20px_0_50px_rgba(0,0,0,0.5)]">
-        <div className="h-20 flex items-center px-6 border-b border-white/5 bg-transparent">
-           <Link href="/dashboard" className="bg-white p-1 rounded-lg hover:scale-105 transition-transform">
+      <aside className={`fixed left-0 top-0 h-screen w-72 bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 backdrop-blur-3xl border-r border-white/5 flex flex-col z-50 shadow-[20px_0_50px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}>
+        <div className="h-20 flex items-center justify-between px-6 border-b border-white/5 bg-transparent">
+           <Link href="/dashboard" className="bg-white p-1 rounded-lg hover:scale-105 transition-transform" onClick={() => setIsSidebarOpen(false)}>
              <Image src="/logo.jpeg" quality={100} alt="PrepAssist Branding" width={140} height={45} className="object-contain" priority/>
            </Link>
+           {/* Mobile Close Button inside Sidebar */}
+           <button className="md:hidden p-1.5 rounded-full hover:bg-white/10 text-white/70 hover:text-white transition-colors" onClick={() => setIsSidebarOpen(false)}>
+              <X className="w-5 h-5"/>
+           </button>
         </div>
         
         <div className="flex-1 overflow-y-auto py-8 px-4 space-y-2">
@@ -204,12 +218,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Main Execution Content Layer */}
-      <main className="flex-1 ml-72 flex flex-col min-h-screen relative overflow-x-hidden text-white selection:bg-indigo-500/30">
+      <main className="flex-1 md:ml-72 flex flex-col min-h-screen relative overflow-x-hidden text-white selection:bg-indigo-500/30 w-full">
          {/* Top Glass Header */}
-         <header className="sticky top-0 h-20 bg-[#020617]/60 backdrop-blur-xl border-b border-white/5 z-40 px-8 flex items-center justify-between shadow-2xl">
-            <div className="flex items-center gap-3">
-               <span className="text-xs font-black uppercase tracking-widest text-white/30 truncate max-w-[200px] md:max-w-none">
-                  Authenticated Root <span className="mx-2 text-indigo-500">/</span> {pathname.replace('/', '').toUpperCase() || 'DASHBOARD'}
+         <header className="sticky top-0 h-20 bg-[#020617]/60 backdrop-blur-xl border-b border-white/5 z-30 px-4 md:px-8 flex items-center justify-between shadow-2xl">
+            <div className="flex items-center gap-2 md:gap-3">
+               <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-white/30 truncate max-w-[120px] md:max-w-none hidden sm:inline-block">
+                  Auth Nav <span className="mx-2 text-indigo-500">/</span> {pathname.replace('/', '').toUpperCase() || 'DASHBOARD'}
                </span>
             </div>
             <div className="flex items-center gap-5">
@@ -299,9 +313,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
          </header>
 
          {/* Internal Payload Engine */}
-         <div className="flex-1 relative pb-20 mt-6">
+         <div className="flex-1 relative pb-32 md:pb-20 mt-6 overflow-y-auto">
             {children}
          </div>
+
+         {/* Mobile Bottom Navigation Architecture */}
+         <nav className="fixed bottom-0 left-0 w-full h-16 bg-[#020617]/90 backdrop-blur-xl border-t border-white/10 z-40 md:hidden flex items-center justify-around px-2 shadow-[0_-10px_40px_rgba(0,0,0,0.8)] pb-safe-bottom">
+            <Link href="/dashboard" className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${pathname === '/dashboard' ? 'text-indigo-400 scale-110' : 'text-white/40 hover:text-white/80'}`}>
+               <LayoutDashboard className="w-5 h-5" />
+               <span className="text-[9px] font-bold">Home</span>
+            </Link>
+            <Link href="/daily-news" className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${pathname === '/daily-news' ? 'text-indigo-400 scale-110' : 'text-white/40 hover:text-white/80'}`}>
+               <Globe className="w-5 h-5" />
+               <span className="text-[9px] font-bold">News</span>
+            </Link>
+            <Link href="/question-bank" className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${pathname === '/question-bank' ? 'text-indigo-400 scale-110' : 'text-white/40 hover:text-white/80'}`}>
+               <ListChecks className="w-5 h-5" />
+               <span className="text-[9px] font-bold">Q-Bank</span>
+            </Link>
+            <Link href="/quiz" className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${pathname === '/quiz' ? 'text-indigo-400 scale-110' : 'text-white/40 hover:text-white/80'}`}>
+               <FileText className="w-5 h-5" />
+               <span className="text-[9px] font-bold">Extract</span>
+            </Link>
+            <button onClick={() => setIsSidebarOpen(true)} className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-all ${isSidebarOpen ? 'text-indigo-400 scale-110' : 'text-white/40 hover:text-white/80'}`}>
+               <Menu className="w-5 h-5" />
+               <span className="text-[9px] font-bold">Menu</span>
+            </button>
+         </nav>
 
          <SupportWidget />
       </main>

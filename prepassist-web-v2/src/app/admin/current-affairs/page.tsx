@@ -51,7 +51,7 @@ export default function CurrentAffairsAdmin() {
          source: source || "Internal Editor",
          tags: tags.split(",").map(t => t.trim()).filter(Boolean),
          publishDate
-      });
+       });
       setSuccess(true);
       setTitle(""); setContent(""); setSource(""); setTags("");
       loadAffairs();
@@ -112,10 +112,7 @@ export default function CurrentAffairsAdmin() {
            throw new Error(errData?.error || `HTTP ${res.status}: API Gateway Crash`);
        }
        
-       const { results, isMock } = await res.json();
-       if (isMock) {
-          alert("DEV NOTE: You did not link your OpenRouter API Key in .env.local! The AI processed the PDF but gracefully fell back to the 2-article mock payload to prevent a crash.");
-       }
+       const { results } = await res.json();
        setExtractedAffairs(results);
      } catch (e: any) {
        console.error(e);
