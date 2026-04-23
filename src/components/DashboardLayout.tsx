@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { LayoutDashboard, FileText, Target, Activity, Settings, User, LogOut, ChevronDown, PenTool, Globe, Cloud, ListChecks, BookOpen, CreditCard, Zap, Network, Bell, FolderUp, Database, HardDrive, Bot, BrainCircuit, ScanText, CalendarDays } from "lucide-react";
+import { LayoutDashboard, FileText, Target, Activity, Settings, User, LogOut, ChevronDown, PenTool, Globe, Cloud, ListChecks, BookOpen, CreditCard, Zap, Network, Bell, FolderUp, Database, HardDrive, Bot, BrainCircuit, ScanText, CalendarDays, Menu, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { db } from "@/lib/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
@@ -18,6 +18,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
    const pathname = usePathname() || "";
    const router = useRouter();
    const [isMenuOpen, setIsMenuOpen] = useState(false);
+   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
    const [userEmail, setUserEmail] = useState<string | null>(null);
    const [userName, setUserName] = useState<string | null>(null);
    const [creditBalance, setCreditBalance] = useState<number | null>(null);
@@ -90,6 +91,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
      router.push("/");
   };
 
+  // Close mobile menu on route change natively for flawless navigation UX
+  useEffect(() => {
+     setIsMobileMenuOpen(false);
+  }, [pathname]);
+
   const publicRoutes = ["/", "/login", "/pricing"];
   if (publicRoutes.includes(pathname) || pathname.startsWith("/admin")) {
      return <>{children}</>;
@@ -135,12 +141,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen bg-[#020617] flex">
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden transition-opacity" onClick={() => setIsMobileMenuOpen(false)} />
+      )}
+
       {/* Sidebar Navigation Matrix */}
-      <aside className="fixed left-0 top-0 h-screen w-72 bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 backdrop-blur-3xl border-r border-white/5 flex flex-col z-50 shadow-[20px_0_50px_rgba(0,0,0,0.5)]">
-        <div className="h-20 flex items-center px-6 border-b border-white/5 bg-transparent">
+      <aside className={`fixed left-0 top-0 h-screen w-72 bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 backdrop-blur-3xl border-r border-white/5 flex flex-col z-50 shadow-[20px_0_50px_rgba(0,0,0,0.5)] transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+        <div className="h-20 flex items-center justify-between px-6 border-b border-white/5 bg-transparent">
            <Link href="/dashboard" className="bg-white p-1 rounded-lg hover:scale-105 transition-transform">
              <Image src="/logo.jpeg" quality={100} alt="PrepAssist Branding" width={140} height={45} className="object-contain" priority/>
            </Link>
+           <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden p-2 text-white/50 hover:text-white bg-white/5 rounded-lg border border-white/10 transition-colors">
+             <X className="w-5 h-5" />
+           </button>
         </div>
         
         <div className="flex-1 overflow-y-auto py-8 px-4 space-y-2">
@@ -204,15 +218,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Main Execution Content Layer */}
-      <main className="flex-1 ml-72 flex flex-col min-h-screen relative overflow-x-hidden text-white selection:bg-indigo-500/30">
+      <main className="flex-1 md:ml-72 flex flex-col min-h-screen relative overflow-x-hidden text-white selection:bg-indigo-500/30 w-full">
          {/* Top Glass Header */}
-         <header className="sticky top-0 h-20 bg-[#020617]/60 backdrop-blur-xl border-b border-white/5 z-40 px-8 flex items-center justify-between shadow-2xl">
+         <header className="sticky top-0 h-20 bg-[#020617]/60 backdrop-blur-xl border-b border-white/5 z-30 px-4 md:px-8 flex items-center justify-between shadow-2xl">
             <div className="flex items-center gap-3">
-               <span className="text-xs font-black uppercase tracking-widest text-white/30 truncate max-w-[200px] md:max-w-none">
-                  Authenticated Root <span className="mx-2 text-indigo-500">/</span> {pathname.replace('/', '').toUpperCase() || 'DASHBOARD'}
+               <button onClick={() => setIsMobileMenuOpen(true)} className="md:hidden p-2 text-white/70 hover:text-white bg-white/5 rounded-lg border border-white/10 shrink-0">
+                  <Menu className="w-5 h-5" />
+               </button>
+               <span className="text-xs font-black uppercase tracking-widest text-white/30 truncate max-w-[140px] sm:max-w-[200px] md:max-w-none">
+                  Authenticated <span className="hidden sm:inline">Root</span> <span className="mx-1 sm:mx-2 text-indigo-500">/</span> {pathname.replace('/', '').toUpperCase() || 'DASHBOARD'}
                </span>
             </div>
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-3 sm:gap-5">
                {/* Realtime Engagespot Global Notification Hub */}
                {process.env.NEXT_PUBLIC_ENGAGESPOT_API_KEY ? (
                   <div className="relative p-1.5 bg-white/5 hover:bg-white/10 rounded-full transition-colors border border-white/5 cursor-pointer shadow-inner z-[100] flex items-center justify-center">
@@ -247,7 +264,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                </Link>
 
                {/* Cloud Vault Volume Tracking Link */}
-               <Link href="/cloud-vault" className="flex items-center gap-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 px-4 py-1.5 rounded-full hover:bg-emerald-500/20 transition-all group">
+               <Link href="/cloud-vault" className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 px-4 py-1.5 rounded-full hover:bg-emerald-500/20 transition-all group">
                   <HardDrive className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
                   <span className="text-sm font-black text-emerald-300">
                      {formatBytes(dataVolumeBytes)} Vault
@@ -258,13 +275,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                <div className="relative">
                   <button 
                     onClick={() => setIsMenuOpen(!isMenuOpen)} 
-                    className="flex items-center gap-3 bg-white/5 pl-2 pr-4 py-1.5 rounded-full border border-white/5 shadow-inner hover:bg-white/10 transition-colors group"
+                    className="flex items-center gap-2 sm:gap-3 bg-white/5 pl-2 pr-2 sm:pr-4 py-1.5 rounded-full border border-white/5 shadow-inner hover:bg-white/10 transition-colors group"
                   >
-                     <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-sky-400 flex items-center justify-center font-black text-white shadow-[0_0_15px_rgba(99,102,241,0.5)] group-hover:scale-105 transition-transform">
+                     <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-sky-400 flex items-center justify-center font-black text-white shadow-[0_0_15px_rgba(99,102,241,0.5)] group-hover:scale-105 transition-transform text-sm sm:text-base">
                         {userName ? userName.charAt(0).toUpperCase() : 'U'}
                      </div>
                      <span className="text-sm font-bold text-white/90 hidden md:block max-w-[150px] truncate">{userName || "User Profile"}</span>
-                     <ChevronDown className={`w-4 h-4 text-white/50 transition-transform ${isMenuOpen ? 'rotate-180 text-indigo-400' : ''}`} />
+                     <ChevronDown className={`w-4 h-4 text-white/50 transition-transform hidden sm:block ${isMenuOpen ? 'rotate-180 text-indigo-400' : ''}`} />
                   </button>
                </div>
 
@@ -299,11 +316,32 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
          </header>
 
          {/* Internal Payload Engine */}
-         <div className="flex-1 relative pb-20 mt-6">
+         <div className="flex-1 relative pb-28 md:pb-20 mt-6">
             {children}
          </div>
 
          <SupportWidget />
+
+         {/* Premium Bottom Navigation for Mobile */}
+         <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#020617]/95 backdrop-blur-2xl border-t border-white/10 z-[60] flex items-center justify-around px-2 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+            {[
+               { href: '/dashboard', icon: LayoutDashboard, label: 'Hub' },
+               { href: '/calendar', icon: CalendarDays, label: 'Plan' },
+               { href: '/ai-mentor', icon: Bot, label: 'Mentor' },
+               { href: '/quiz', icon: FileText, label: 'PDFs' },
+               { href: '/ai-prelims', icon: Target, label: 'Prelims' }
+            ].map((item, idx) => {
+               const isActive = pathname === item.href;
+               return (
+                  <Link key={idx} href={item.href} className={`flex flex-col items-center justify-center w-full h-full transition-all ${isActive ? 'text-indigo-400' : 'text-white/40 hover:text-white/70'}`}>
+                     <div className={`relative flex items-center justify-center p-1.5 rounded-full transition-all duration-300 ${isActive ? 'bg-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.3)] text-indigo-400 scale-110 -translate-y-1' : ''}`}>
+                        <item.icon className="w-[18px] h-[18px]" strokeWidth={isActive ? 2.5 : 2} />
+                     </div>
+                     <span className={`text-[9px] font-bold mt-0.5 transition-all duration-300 tracking-wide ${isActive ? 'text-indigo-400 opacity-100' : 'opacity-70'}`}>{item.label}</span>
+                  </Link>
+               )
+            })}
+         </div>
       </main>
     </div>
   );
