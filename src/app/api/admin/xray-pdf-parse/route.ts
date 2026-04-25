@@ -79,10 +79,10 @@ export async function POST(req: Request) {
            const result = await executeWithResilience(() => model.generateContent([prompt, pdfPart]), "Tier 1: 2.5 Flash");
            responseText = result.response.text();
         } catch (e: any) {
-           console.warn("Tier 1 Failed, trying Tier 2 (1.5 Flash):", e.message);
+           console.warn("Tier 1 Failed, trying Tier 2 (2.0 Flash):", e.message);
            try {
-              const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-              const result = await executeWithResilience(() => model.generateContent([prompt, pdfPart]), "Tier 2: 1.5 Flash");
+              const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+              const result = await executeWithResilience(() => model.generateContent([prompt, pdfPart]), "Tier 2: 2.0 Flash");
               responseText = result.response.text();
            } catch (e2: any) {
               console.warn("Tier 2 Failed, trying Tier 3 (1.5 Pro):", e2.message);
