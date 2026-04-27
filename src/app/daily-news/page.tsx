@@ -225,11 +225,11 @@ export default function DailyNewsUserPanel() {
          {activeArticleIndex !== null && (
            <motion.div 
              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-             className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-6 bg-slate-900/40 backdrop-blur-md"
+             className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-slate-900/60 backdrop-blur-md"
            >
              <motion.div 
-               initial={{ scale: 0.98, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.98, y: 30 }}
-               className="relative w-full h-full md:w-[96vw] md:h-[96vh] max-w-[1600px] bg-white border border-slate-200 shadow-2xl md:rounded-[2.5rem] flex flex-col overflow-hidden"
+               initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
+               className="relative w-full h-full md:w-[85vw] lg:w-[75vw] md:h-[85vh] max-w-[1200px] bg-white border border-slate-200 shadow-[0_0_50px_rgba(0,0,0,0.15)] md:rounded-[2rem] flex flex-col overflow-hidden"
              >
                 {/* Massive Header Engine */}
                 <div className="p-6 md:px-12 md:py-8 border-b border-slate-100 flex items-center justify-between bg-white z-10 shrink-0">
