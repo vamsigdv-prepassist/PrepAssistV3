@@ -8,19 +8,19 @@ async function listModels() {
   try {
     // There is no direct listModels in the JS SDK usually, it's in the REST API.
     // But we can try to probe.
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: "v1" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }, { apiVersion: "v1" });
     const result = await model.generateContent("test");
-    console.log("gemini-1.5-flash works!");
+    console.log("gemini-2.0-flash works!");
   } catch (e) {
-    console.error("gemini-1.5-flash failed:", e);
+    console.error("gemini-2.0-flash failed:", e);
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: "v1" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }, { apiVersion: "v1" });
     const result = await model.generateContent("test");
-    console.log("gemini-1.5-flash works!");
+    console.log("gemini-2.0-flash works!");
   } catch (e) {
-    console.error("gemini-1.5-flash failed:", e);
+    console.error("gemini-2.0-flash failed:", e);
   }
 }
 
