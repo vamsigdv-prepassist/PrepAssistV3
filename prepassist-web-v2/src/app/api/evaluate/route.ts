@@ -76,7 +76,7 @@ Please provide a comprehensive evaluation in the following JSON format (respond 
 
 Be honest, constructive, and specific in your feedback. The score should reflect stringent UPSC Mains standards.`;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     const parts: any[] = [];
     
     parts.push({ text: basePrompt });

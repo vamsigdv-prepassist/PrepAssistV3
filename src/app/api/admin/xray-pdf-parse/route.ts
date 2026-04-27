@@ -75,7 +75,7 @@ export async function POST(req: Request) {
         let responseText = "";
 
         try {
-           const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+           const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
            const result = await executeWithResilience(() => model.generateContent([prompt, pdfPart]), "Tier 1: 2.5 Flash");
            responseText = result.response.text();
         } catch (e: any) {
