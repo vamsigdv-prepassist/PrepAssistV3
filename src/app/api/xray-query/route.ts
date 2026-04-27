@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Native Google API Credentials missing for fallback generator.' }, { status: 500 });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     const extractionPrompt = `
       You are a strict UPSC Professor. I have a sentence extracted from a document. 
       Analyze this sentence strictly from the UPSC Civil Services perspective: "${sentence}"

@@ -103,7 +103,7 @@ export async function POST(req: Request) {
       const prompt = "Extract absolutely all text exactly as written from this document. Provide only raw transcription. No filler.";
 
       try {
-         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
          const result = await executeWithResilience(() => model.generateContent([{ text: prompt }, config]), "Tier 1: 2.5 Flash");
          extractedText = result.response.text();
       } catch (e: any) {
@@ -189,7 +189,7 @@ export async function POST(req: Request) {
      let result;
      try {
        const model = genAI.getGenerativeModel({ 
-          model: "gemini-2.5-flash",
+          model: "gemini-2.0-flash",
           systemInstruction: `You are the absolute UPSC Master Mentor for ${subject}. 
           Your goal is to assist aspirants with conceptual clarity and current affairs integration natively.
           Core Persona Rules:
