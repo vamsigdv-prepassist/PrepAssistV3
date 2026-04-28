@@ -4,6 +4,8 @@ import { supabase } from '@/lib/supabase';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: Request) {
    try {
       const authHeader = req.headers.get("Authorization");
